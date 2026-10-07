@@ -1,0 +1,122 @@
+name: 'Terraform AVD Infrastructure Workflow'
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+      action:
+        description: 'Terraform Action'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate:
+    name: 'Terraform Format & Validate'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Validate DEV Environment
+        run: |
+          cd environments/dev
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate PROD Environment
+        run: |
+          cd environments/prod
+          terraform init -backend=false
+          terraform validate
+
+  plan:
+    name: 'Terraform Plan'
+    needs: validate
+    runs-on: ubuntu-latest
+    env:
+      TARGET_ENV: ${{ inputs.environment || 'dev' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Azure Login (OIDC / Credentials)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Terraform Init & Plan
+        run: |
+          cd environments/${{ env.TARGET_ENV }}
+          terraform init
+          terraform plan -var-file="terraform.tfvars"
+
+  apply:
+    name: 'Terraform Apply'
+    needs: plan
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'apply'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      TARGET_ENV: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Terraform Init & Apply
+        run: |
+          cd environments/${{ env.TARGET_ENV }}
+          terraform init
+          terraform apply -auto-approve -var-file="terraform.tfvars"
