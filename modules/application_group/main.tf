@@ -8,8 +8,8 @@ resource "azurerm_virtual_desktop_application_group" "appgroup" {
 }
 
 resource "azurerm_role_assignment" "avd_user_assignment" {
-  for_each             = toset(var.assignee_principal_ids)
+  count                = length(var.assignee_principal_ids)
   scope                = azurerm_virtual_desktop_application_group.appgroup.id
   role_definition_name = "Desktop Virtualization User"
-  principal_id         = each.value
+  principal_id         = var.assignee_principal_ids[count.index]
 }

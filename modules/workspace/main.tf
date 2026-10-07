@@ -6,7 +6,7 @@ resource "azurerm_virtual_desktop_workspace" "workspace" {
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "assoc" {
-  for_each             = toset(var.application_group_ids)
+  count                = length(var.application_group_ids)
   workspace_id         = azurerm_virtual_desktop_workspace.workspace.id
-  application_group_id = each.value
+  application_group_id = var.application_group_ids[count.index]
 }
