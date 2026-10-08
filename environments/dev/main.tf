@@ -28,14 +28,14 @@ module "entra_test_user" {
 
 # 4. Personal AVD Host Pool & Resources
 module "personal_host_pool" {
-  source                            = "../../modules/host_pool"
-  host_pool_name                    = "hp-avd-personal-${var.environment}"
-  location                          = module.resource_group.location
-  resource_group_name               = module.resource_group.name
-  host_pool_type                    = "Personal"
-  load_balancer_type                = "Persistent"
+  source                           = "../../modules/host_pool"
+  host_pool_name                   = "hp-avd-personal-${var.environment}"
+  location                         = module.resource_group.location
+  resource_group_name              = module.resource_group.name
+  host_pool_type                   = "Personal"
+  load_balancer_type               = "Persistent"
   personal_desktop_assignment_type = "Automatic"
-  tags                              = var.tags
+  tags                             = var.tags
 }
 
 module "personal_app_group" {
@@ -50,18 +50,18 @@ module "personal_app_group" {
 }
 
 module "personal_session_host" {
-  source                        = "../../modules/session_host"
-  vm_name                       = "vmavdpers${var.environment}"
-  location                      = module.resource_group.location
-  resource_group_name           = module.resource_group.name
-  subnet_id                     = module.network.subnet_id
-  vm_size                       = var.vm_size
-  admin_username                = var.admin_username
-  admin_password                = var.admin_password
-  host_pool_name                = module.personal_host_pool.name
+  source                       = "../../modules/session_host"
+  vm_name                      = "vmavdpers${var.environment}"
+  location                     = module.resource_group.location
+  resource_group_name          = module.resource_group.name
+  subnet_id                    = module.network.subnet_id
+  vm_size                      = var.vm_size
+  admin_username               = var.admin_username
+  admin_password               = var.admin_password
+  host_pool_name               = module.personal_host_pool.name
   host_pool_registration_token = module.personal_host_pool.registration_token
-  assigned_user_object_ids      = [module.entra_test_user.object_id]
-  tags                          = var.tags
+  assigned_user_object_ids     = [module.entra_test_user.object_id]
+  tags                         = var.tags
 }
 
 # 5. Pooled AVD Host Pool & Resources
@@ -88,29 +88,29 @@ module "pooled_app_group" {
 }
 
 module "pooled_session_host" {
-  source                        = "../../modules/session_host"
-  vm_name                       = "vmavdpool${var.environment}"
-  location                      = module.resource_group.location
-  resource_group_name           = module.resource_group.name
-  subnet_id                     = module.network.subnet_id
-  vm_size                       = var.vm_size
-  admin_username                = var.admin_username
-  admin_password                = var.admin_password
-  host_pool_name                = module.pooled_host_pool.name
+  source                       = "../../modules/session_host"
+  vm_name                      = "vmavdpool${var.environment}"
+  location                     = module.resource_group.location
+  resource_group_name          = module.resource_group.name
+  subnet_id                    = module.network.subnet_id
+  vm_size                      = var.vm_size
+  admin_username               = var.admin_username
+  admin_password               = var.admin_password
+  host_pool_name               = module.pooled_host_pool.name
   host_pool_registration_token = module.pooled_host_pool.registration_token
-  assigned_user_object_ids      = [module.entra_test_user.object_id]
-  tags                          = var.tags
+  assigned_user_object_ids     = [module.entra_test_user.object_id]
+  tags                         = var.tags
 }
 
 # 6. AVD Unified Workspace
 module "workspace" {
-  source                = "../../modules/workspace"
-  workspace_name        = "ws-avd-${var.environment}"
-  location              = module.resource_group.location
-  resource_group_name   = module.resource_group.name
+  source              = "../../modules/workspace"
+  workspace_name      = "ws-avd-${var.environment}"
+  location            = module.resource_group.location
+  resource_group_name = module.resource_group.name
   application_group_ids = [
     module.personal_app_group.id,
     module.pooled_app_group.id
   ]
-  tags                  = var.tags
+  tags = var.tags
 }
