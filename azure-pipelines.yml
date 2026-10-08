@@ -37,23 +37,22 @@ parameters:
 
 variables:
   - name: TERRAFORM_VERSION
-    value: '1.8.5'
+    value: "1.8.5"
   - name: AZURE_SERVICE_CONNECTION
-    value: 'azure-spn-avd-connection' # Replace with your Azure DevOps Service Connection name
+    value: "AVD_Dev_Prod" # Replace with your Azure DevOps Service Connection name
 
 stages:
-  - stage: Validate
-    displayName: "Terraform Validate & Lint"
+  - stage: install_Validate
+    displayName: "Terraform Install & Validate & Lint"
     jobs:
       - job: ValidateCode
         displayName: "Validate Terraform Code"
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: "ubuntu-latest"
         steps:
-          - task: HashiCorpInstaller@1
-            displayName: "Install Terraform"
+          - task: TerraformInstaller@1
             inputs:
-              terraformVersion: '$(TERRAFORM_VERSION)'
+              terraformVersion: "$(TERRAFORM_VERSION)"
 
           - script: |
               echo "==> Running Terraform Format Check..."
@@ -74,28 +73,27 @@ stages:
 
   - stage: Plan
     displayName: "Terraform Plan (${{ parameters.environment }})"
-    dependsOn: Validate
+    dependsOn: install_Validate
     jobs:
       - job: PlanJob
         displayName: "Plan Infrastructure"
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: "ubuntu-latest"
         steps:
-          - task: HashiCorpInstaller@1
-            displayName: "Install Terraform"
+          - task: TerraformInstaller@1
             inputs:
-              terraformVersion: '$(TERRAFORM_VERSION)'
+              terraformVersion: "$(TERRAFORM_VERSION)"
 
           - task: AzureCLI@2
             displayName: "Terraform Init & Plan (${{ parameters.environment }})"
             inputs:
-              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
+              azureSubscription: "$(AZURE_SERVICE_CONNECTION)"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
               inlineScript: |
                 set -e
                 cd environments/${{ parameters.environment }}
-                
+
                 echo "==> Initializing Terraform for ${{ parameters.environment }}..."
                 terraform init
 
@@ -110,25 +108,24 @@ stages:
       - deployment: ApplyJob
         displayName: "Deploy Infrastructure"
         pool:
-          vmImage: 'ubuntu-latest'
-        environment: '${{ parameters.environment }}-avd-environment'
+          vmImage: "ubuntu-latest"
+        environment: "${{ parameters.environment }}-avd-environment"
         strategy:
           runOnce:
             deploy:
               steps:
                 - checkout: self
 
-                - task: HashiCorpInstaller@1
-                  displayName: "Install Terraform"
+                - task: TerraformInstaller@1
                   inputs:
-                    terraformVersion: '$(TERRAFORM_VERSION)'
+                    terraformVersion: "$(TERRAFORM_VERSION)"
 
                 - task: AzureCLI@2
                   displayName: "Terraform Apply (${{ parameters.environment }})"
                   inputs:
-                    azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
-                    scriptType: 'bash'
-                    scriptLocation: 'inlineScript'
+                    azureSubscription: "$(AZURE_SERVICE_CONNECTION)"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
                     inlineScript: |
                       set -e
                       cd environments/${{ parameters.environment }}
