@@ -61,8 +61,8 @@ variable "custom_rdp_properties" {
 
 variable "registration_expiration_date" {
   type        = string
-  description = "Expiration date/time for host pool registration token (RFC3339 format)."
-  default     = "2026-12-31T23:59:59Z"
+  description = "Optional expiration date/time for host pool registration token (RFC3339 format). Defaults to dynamic 27-day offset if null."
+  default     = null
 }
 
 variable "tags" {

@@ -1,3 +1,7 @@
+resource "time_offset" "registration_expiration" {
+  offset_days = 27
+}
+
 resource "azurerm_virtual_desktop_host_pool" "hp" {
   name                             = var.host_pool_name
   location                         = var.location
@@ -14,5 +18,5 @@ resource "azurerm_virtual_desktop_host_pool" "hp" {
 
 resource "azurerm_virtual_desktop_host_pool_registration_info" "registration" {
   hostpool_id     = azurerm_virtual_desktop_host_pool.hp.id
-  expiration_date = var.registration_expiration_date
+  expiration_date = var.registration_expiration_date != null && var.registration_expiration_date != "" ? var.registration_expiration_date : time_offset.registration_expiration.rfc3339
 }

@@ -35,7 +35,6 @@ module "personal_host_pool" {
   host_pool_type                    = "Personal"
   load_balancer_type                = "Persistent"
   personal_desktop_assignment_type = "Automatic"
-  registration_expiration_date      = "2026-12-31T23:59:59Z"
   tags                              = var.tags
 }
 
@@ -67,15 +66,14 @@ module "personal_session_host" {
 
 # 5. Pooled AVD Host Pool & Resources
 module "pooled_host_pool" {
-  source                       = "../../modules/host_pool"
-  host_pool_name               = "hp-avd-pooled-${var.environment}"
-  location                     = module.resource_group.location
-  resource_group_name          = module.resource_group.name
-  host_pool_type               = "Pooled"
-  load_balancer_type           = "BreadthFirst"
-  maximum_sessions_allowed     = 10
-  registration_expiration_date = "2026-12-31T23:59:59Z"
-  tags                         = var.tags
+  source                   = "../../modules/host_pool"
+  host_pool_name           = "hp-avd-pooled-${var.environment}"
+  location                 = module.resource_group.location
+  resource_group_name      = module.resource_group.name
+  host_pool_type           = "Pooled"
+  load_balancer_type       = "BreadthFirst"
+  maximum_sessions_allowed = 10
+  tags                     = var.tags
 }
 
 module "pooled_app_group" {
