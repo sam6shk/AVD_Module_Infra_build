@@ -21,6 +21,7 @@ module "network" {
 # 3. Entra ID (Azure AD) Test User
 module "entra_test_user" {
   source              = "../../modules/entra_user"
+  create_user         = var.create_test_user
   user_principal_name = "avd.testuser.${var.environment}@${var.domain_name}"
   display_name        = "AVD Test User (${upper(var.environment)})"
   mail_nickname       = "avdtestuser${var.environment}"

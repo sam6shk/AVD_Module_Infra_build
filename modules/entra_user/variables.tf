@@ -1,3 +1,9 @@
+variable "create_user" {
+  type        = bool
+  description = "Set to true to create a new Entra ID user, or false to look up an existing user."
+  default     = true
+}
+
 variable "user_principal_name" {
   type        = string
   description = "The User Principal Name (UPN) of the Entra ID test user."

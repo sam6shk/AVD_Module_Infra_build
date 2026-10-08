@@ -10,6 +10,12 @@ variable "location" {
   default     = "eastus"
 }
 
+variable "create_test_user" {
+  type        = bool
+  description = "Set to true to create a new Entra ID test user, or false to use an existing Entra ID user UPN."
+  default     = true
+}
+
 variable "domain_name" {
   type        = string
   description = "Primary Entra ID (Azure AD) verified domain name (e.g. sameershaik2outlook.onmicrosoft.com)."
