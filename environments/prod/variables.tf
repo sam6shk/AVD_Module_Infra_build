@@ -12,8 +12,8 @@ variable "location" {
 
 variable "domain_name" {
   type        = string
-  description = "Primary Entra ID (Azure AD) domain name for user principal name (e.g. contoso.onmicrosoft.com)."
-  default     = "onmicrosoft.com"
+  description = "Primary Entra ID (Azure AD) domain name. If null, automatically resolves to tenant primary .onmicrosoft.com domain."
+  default     = null
 }
 
 variable "admin_username" {

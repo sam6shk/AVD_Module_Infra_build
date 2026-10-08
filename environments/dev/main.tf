@@ -1,3 +1,11 @@
+data "azuread_domains" "tenant_domain" {
+  only_initial = true
+}
+
+locals {
+  domain_name = var.domain_name != null && var.domain_name != "" && var.domain_name != "yourdomain.onmicrosoft.com" ? var.domain_name : data.azuread_domains.tenant_domain.domains[0].domain_name
+}
+
 # 1. Resource Group
 module "resource_group" {
   source              = "../../modules/resource_group"
@@ -21,7 +29,7 @@ module "network" {
 # 3. Entra ID (Azure AD) Test User
 module "entra_test_user" {
   source              = "../../modules/entra_user"
-  user_principal_name = "avd.testuser.${var.environment}@${var.domain_name}"
+  user_principal_name = "avd.testuser.${var.environment}@${local.domain_name}"
   display_name        = "AVD Test User (${upper(var.environment)})"
   mail_nickname       = "avdtestuser${var.environment}"
 }
