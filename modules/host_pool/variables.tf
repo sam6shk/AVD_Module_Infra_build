@@ -56,7 +56,7 @@ variable "start_vm_on_connect" {
 variable "custom_rdp_properties" {
   type        = string
   description = "Custom RDP properties string."
-  default     = "audiocapturemode:i:1;videocapturemode:i:1;targetisaadjoined:i:1;drivestoredirect:s:*;redirectclipboard:i:1;"
+  default     = "audiocapturemode:i:1;videocapturemode:i:1;targetisaadjoined:i:1;enablerdsaadauth:i:1;drivestoredirect:s:*;redirectclipboard:i:1;"
 }
 
 variable "registration_expiration_date" {
