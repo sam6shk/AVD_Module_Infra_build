@@ -28,6 +28,12 @@ variable "admin_password" {
   sensitive   = true
 }
 
+variable "vm_size" {
+  type        = string
+  description = "Virtual machine SKU size for session host VMs (e.g. Standard_B2s, Standard_D2s_v5)."
+  default     = "Standard_B2s"
+}
+
 variable "tags" {
   type        = map(string)
   description = "Common tags for prod environment."

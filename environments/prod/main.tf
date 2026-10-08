@@ -56,7 +56,7 @@ module "personal_session_host" {
   location                      = module.resource_group.location
   resource_group_name           = module.resource_group.name
   subnet_id                     = module.network.subnet_id
-  vm_size                       = "Standard_D4s_v5"
+  vm_size                       = var.vm_size
   admin_username                = var.admin_username
   admin_password                = var.admin_password
   host_pool_name                = module.personal_host_pool.name
@@ -95,7 +95,7 @@ module "pooled_session_host" {
   location                      = module.resource_group.location
   resource_group_name           = module.resource_group.name
   subnet_id                     = module.network.subnet_id
-  vm_size                       = "Standard_D4s_v5"
+  vm_size                       = var.vm_size
   admin_username                = var.admin_username
   admin_password                = var.admin_password
   host_pool_name                = module.pooled_host_pool.name
